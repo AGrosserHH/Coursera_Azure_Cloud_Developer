@@ -1,0 +1,146 @@
+data:
+  FUNCTIONS_WORKER_RUNTIME: cHl0aG9u
+  FUNCTIONS_EXTENSION_VERSION: fjI=
+  AzureWebJobsStorage: RGVmYXVsdEVuZHBvaW50c1Byb3RvY29sPWh0dHBzO0VuZHBvaW50U3VmZml4PWNvcmUud2luZG93cy5uZXQ7QWNjb3VudE5hbWU9bXluZWlnaGJvcmx5YXBpc3RvcmFnZTtBY2NvdW50S2V5PXVudUwzellGbFQzdDB3VERrK1BRbzdzRENYNzVZRE0rdG55cHhPV2VYL2pRY2svZEZLcEdPRVhEaHNYc1FJVnM5eTd1K0g3MFBWSUl2dTliS3RYejlnPT0=
+  APPINSIGHTS_INSTRUMENTATIONKEY: NTIxNGU2ZTktOWMzOS00MDNhLWI1NTktNTcwMGEyNjBjZjcz
+apiVersion: v1
+kind: Secret
+metadata:
+  name: neighborcluster
+  namespace: keda
+---
+data:
+  host.master: ZzF2N0ptbVduRVUzMHlIL2Jtbi9hQ0xlTlFNdjRqcGdxdVAvNGJwZHFEbDZwZ2tBUnJLUXBBPT0=
+  host.function.default: R0pwZDVhRGlVTGN1WWE1RWhMTEIwcVQ2VTllVDVZUFIyaEtLUEY5NjJSVEpQU0VYa244cW9RPT0=
+  host.systemKey.default: aVJsVXp1bk5HL1R3QlcvMFB2UDNNeGdKNGg2ODNpODJCUENWOThjV1BQZmx6bVZueXlVT3BRPT0=
+  functions.createadvertisement.default: YTg0SGNRRVhZYlRyL2ZaS3d6RXplS2NmdmFnV2VwakxiYWtLcHh6NzBkQlpPQ3oxL3dWYTFBPT0=
+  functions.deleteadvertisement.default: bE9pVy9FN1loS2lvY2pIWGFickRKTElPVW5TaGFoa3pHYnRGb0E5UHRuZlU5NmdkbzBHQUpBPT0=
+  functions.getadvertisement.default: YUlJd1dlUzFxN25aL0RMTjlLcnZGcU05ZWgwaDVtNFpRdEwweFNSL0poWGRJQndKRnBDTmxRPT0=
+  functions.getadvertisements.default: Rnh5VkVVU05kZUszS2Ezc2RWYnRkYmIxNWhEdFFBNGVpdmQycHJBWk1LYnZ5bDEvcEU3eGZRPT0=
+  functions.getpost.default: YmFaQ2hUMExGaVlCa0ttaVpOdTFucHlTc3FldU9UbXdLUTE2YTJueGJpM2NqV25sU3BDaFhnPT0=
+  functions.getposts.default: N2hkN3l4cUxBQm5vV2VBRTQzbkZDTlNnN1ZuMy9FSDF2WjJTRVdJY2pHOXNhd2pOeDlsWjlRPT0=
+  functions.updateadvertisement.default: S0doRUQxZkYxWXFoNy9pZWlXMzFZLzRhS2JjT0xhS2tyZGNTbEtRSS9xTmZkYXYzM3g5TTZnPT0=
+apiVersion: v1
+kind: Secret
+metadata:
+  name: func-keys-kube-secret-neighborcluster
+  namespace: keda
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: neighborcluster-function-keys-identity-svc-act
+  namespace: keda
+---
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - secrets
+  - configMaps
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: functions-keys-manager-role
+  namespace: keda
+---
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: functions-keys-manager-role
+subjects:
+- kind: ServiceAccount
+  name: neighborcluster-function-keys-identity-svc-act
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: neighborcluster-function-keys-identity-svc-act-functions-keys-manager-rolebinding
+  namespace: keda
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: neighborcluster-http
+  namespace: keda
+spec:
+  selector:
+    app: neighborcluster-http
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neighborcluster-http
+  namespace: keda
+  labels:
+    app: neighborcluster-http
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: neighborcluster-http
+  template:
+    metadata:
+      labels:
+        app: neighborcluster-http
+    spec:
+      containers:
+      - name: neighborcluster-http
+        image: myneighborlyreg.azurecr.io/myneighbor-image:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: AzureFunctionsJobHost__functions__0
+          value: createAdvertisement
+        - name: AzureFunctionsJobHost__functions__1
+          value: deleteAdvertisement
+        - name: AzureFunctionsJobHost__functions__2
+          value: getAdvertisement
+        - name: AzureFunctionsJobHost__functions__3
+          value: getAdvertisements
+        - name: AzureFunctionsJobHost__functions__4
+          value: getPost
+        - name: AzureFunctionsJobHost__functions__5
+          value: getPosts
+        - name: AzureFunctionsJobHost__functions__6
+          value: updateAdvertisement
+        - name: AzureWebJobsSecretStorageType
+          value: kubernetes
+        - name: AzureWebJobsKubernetesSecretName
+          value: secrets/func-keys-kube-secret-neighborcluster
+        envFrom:
+        - secretRef:
+            name: neighborcluster
+        readinessProbe:
+          failureThreshold: 3
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 240
+          httpGet:
+            path: /
+            port: 80
+            scheme: HTTP
+        startupProbe:
+          failureThreshold: 3
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 240
+          httpGet:
+            path: /
+            port: 80
+            scheme: HTTP
+      serviceAccountName: neighborcluster-function-keys-identity-svc-act
+---
+
