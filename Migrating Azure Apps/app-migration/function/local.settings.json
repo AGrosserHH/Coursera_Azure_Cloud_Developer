@@ -1,0 +1,13 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "python",
+    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=migrationstorageandi;AccountKey=cjv4/GbTCGhf5rQbO9+NCDU1IlPRozNHrQ03O5jxNiBCD7GUJFVwMFphQGtqnL2qDrF/PSURekwvvPGF+WuRdg==",
+    "appmigration_SERVICEBUS": "Endpoint=sb://appmigration.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=ohi+wKG4SWXpbmoBZJO6zrU0FmWoIkEirHz9iVKOc0I=",
+    "MACHINEKEY_DecryptionKey": "72678613C5752C75D69DB4A63B16E669B24B2CD5D8150E699018071BD0A354F2",
+    "WEBSITES_ENABLE_APP_SERVICE_STORAGE": "true",
+    "FUNCTIONS_EXTENSION_VERSION": "~2",
+    "APPINSIGHTS_INSTRUMENTATIONKEY": "e4a163e0-01ea-4102-84de-be200537147b"
+  },
+  "ConnectionStrings": {}
+}
